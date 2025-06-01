@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Table, Form, Button } from 'react-bootstrap';
 import { FaSearch, FaHeart, FaShoppingCart, FaBars, FaAngleDown, FaTimes, FaSpinner } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
-import './ShoppingCart.css'; // Custom CSS
 
 const Shoppingcart = () => {
   const [showSearch, setShowSearch] = useState(false);
