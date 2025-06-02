@@ -26,7 +26,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100'}`}>
+    <div className={`min-h-screen flex ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100'}`}>
       {/* Dashboard Sidebar */}
       <aside className={`fixed inset-y-0 left-0 ${isDarkMode ? 'bg-gray-800' : 'bg-[#111111]'} w-64 transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static lg:inset-0`}>
         <div className="h-full flex flex-col">
@@ -68,7 +68,7 @@ const DashboardLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 ${isSidebarOpen ? 'lg:ml-64' : ''}`}>
+      <div className="flex-1 flex flex-col">
         {/* Top Navigation */}
         <header className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
           <div className="h-16 flex items-center justify-between px-4">
@@ -150,7 +150,7 @@ const DashboardLayout = () => {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="flex-1 p-6 overflow-auto">
           <Container fluid>
             <Outlet />
           </Container>
