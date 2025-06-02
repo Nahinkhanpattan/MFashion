@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Dropdown } from 'react-bootstrap';
-import { FaUser, FaSignOutAlt, FaCog, FaShoppingBag } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useContext, useEffect } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Container, Row, Col } from 'react-bootstrap';
+import { FaSearch, FaHeart, FaShoppingCart, FaAngleDown, FaBars, FaTimes, FaUser, FaSignOutAlt, FaCog, FaShoppingBag } from 'react-icons/fa';
+import { AuthContext } from '../context/AuthContext';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
-  const [isOffcanvasVisible, setOffcanvasVisible] = useState(false);
-  const [activeSubmenu, setActiveSubmenu] = useState(null);
+  const location = useLocation();
+  const { isAuthenticated, logout } = useContext(AuthContext);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [cartItems, setCartItems] = useState(0);
+  const [showSearch, setShowSearch] = useState(false);
+  const [showPagesDropdown, setShowPagesDropdown] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const toggleOffcanvas = () => {
-    setOffcanvasVisible(!isOffcanvasVisible);
-  };
-
-  const handleMouseEnter = (menu) => {
-    setActiveSubmenu(menu);
-  };
-
-  const handleMouseLeave = () => {
-    setActiveSubmenu(null);
-  };
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -28,180 +28,332 @@ const Header = () => {
   };
 
   return (
-    <header className="header bg-white">
-      {/* Top Bar */}
-      <div className="header__top bg-[#111111] py-2.5">
-        <Container>
-          <Row>
-            <Col lg={6} md={7}>
-              <div className="header__top__left">
-                <p className="text-white mb-0">Free shipping, 30-day return or refund guarantee.</p>
-              </div>
-            </Col>
-            <Col lg={6} md={5}>
-              <div className="header__top__right text-right">
-                <div className="header__top__links inline-block mr-6">
+    <>
+      {/* Preloader */}
+      {loading && (
+        <div className="fixed inset-0 bg-white z-[9999] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-500"></div>
+        </div>
+      )}
+
+      <style>
+        {`
+          a {
+            text-decoration: none !important;
+          }
+          .nav-link {
+            text-decoration: none !important;
+          }
+          .nav-link:hover {
+            text-decoration: none !important;
+          }
+          /* Hide scrollbar when preloader is active */
+          body:has(.fixed.inset-0.bg-white.z-\[9999\]) {
+            overflow: hidden;
+          }
+        `}
+      </style>
+      
+      <header className="bg-white relative">
+        <div className="bg-black text-white py-2 hidden lg:block">
+          <Container>
+            <Row>
+              <Col lg={6} md={7}>
+                <p className="mb-0">Free shipping, 30-day return or refund guarantee.</p>
+              </Col>
+              <Col lg={6} md={5} className="text-right">
+                <div className="inline-block mr-6">
                   {!isAuthenticated ? (
-                    <Link to="/login" className="text-white text-xs uppercase tracking-[2px] mr-7 inline-block">Sign in</Link>
+                    <Link to="/login" className="text-white uppercase text-sm font-semibold mr-6 hover:text-gray-300 no-underline">Sign in</Link>
                   ) : (
-                    <Dropdown className="inline-block">
-                      <Dropdown.Toggle variant="link" className="text-white text-xs uppercase tracking-[2px] mr-7 inline-block">
-                        <FaUser className="inline-block mr-1" /> My Account
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu className="mt-2">
-                        <Dropdown.Item as={Link} to="/profile">
-                          <FaUser className="inline-block mr-2" /> Profile
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/orders">
-                          <FaShoppingBag className="inline-block mr-2" /> Orders
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/settings">
-                          <FaCog className="inline-block mr-2" /> Settings
-                        </Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item onClick={handleLogout} className="text-danger">
-                          <FaSignOutAlt className="inline-block mr-2" /> Sign out
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
+                    <div className="inline-block relative group">
+                      <span className="text-white uppercase text-sm font-semibold cursor-pointer mr-6 hover:text-gray-300">
+                        <FaUser className="inline-block mr-1" /> My Account <FaAngleDown className="inline" />
+                      </span>
+                      <ul className="absolute left-0 top-6 bg-white shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[200px] z-50">
+                        <li>
+                          <Link to="/profile" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
+                            <FaUser className="mr-2" /> Profile
+                          </Link>
+                        </li>
+                        <li>
+                          <Link to="/orders" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
+                            <FaShoppingBag className="mr-2" /> Orders
+                          </Link>
+                        </li>
+                        <li>
+                          <Link to="/settings" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
+                            <FaCog className="mr-2" /> Settings
+                          </Link>
+                        </li>
+                        <li>
+                          <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-red-600 text-sm hover:bg-gray-100 flex items-center">
+                            <FaSignOutAlt className="mr-2" /> Sign out
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
                   )}
-                  <Link to="/faqs" className="text-white text-xs uppercase tracking-[2px] inline-block">FAQs</Link>
+                  <Link to="/faqs" className="text-white uppercase text-sm font-semibold hover:text-gray-300 no-underline">FAQs</Link>
                 </div>
-                <div className="header__top__hover inline-block relative">
-                  <span className="text-white text-xs uppercase tracking-[2px] inline-block cursor-pointer">
-                    USD <i className="arrow_carrot-down"></i>
+                <div className="inline-block relative group">
+                  <span className="text-white uppercase text-sm font-semibold cursor-pointer">
+                    USD <FaAngleDown className="inline" />
                   </span>
-                  <ul className="bg-white inline-block p-[2px_0] absolute left-0 top-11 opacity-0 invisible z-[3] shadow-[0_10px_20px_rgba(0,0,0,0.1)] transition-all duration-300">
-                    <li className="text-[#111111] text-xs py-0.5 px-4 cursor-pointer">USD</li>
-                    <li className="text-[#111111] text-xs py-0.5 px-4 cursor-pointer">EUR</li>
-                    <li className="text-[#111111] text-xs py-0.5 px-4 cursor-pointer">GBP</li>
+                  <ul className="absolute left-0 top-6 bg-white shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[100px] z-50">
+                    <li className="px-4 py-2 text-black text-sm hover:bg-gray-100 cursor-pointer">USD</li>
+                    <li className="px-4 py-2 text-black text-sm hover:bg-gray-100 cursor-pointer">EUR</li>
+                    <li className="px-4 py-2 text-black text-sm hover:bg-gray-100 cursor-pointer">GBP</li>
                   </ul>
                 </div>
+              </Col>
+            </Row>
+          </Container>
+        </div>
+        <Container>
+          <Row className="py-4 items-center">
+            <Col lg={3} md={3} className="flex items-center">
+              <button className="lg:hidden mr-4 text-black" onClick={() => setShowMobileMenu(true)}>
+                <FaBars size={24} />
+              </button>
+              <Link to="/" className="no-underline">
+                <img src="/img/logo.png" alt="Logo" className="max-w-full" />
+              </Link>
+            </Col>
+            <Col lg={6} md={6} className="text-center">
+              <nav className="hidden lg:block">
+                <ul className="flex justify-center space-x-10">
+                  <li>
+                    <NavLink 
+                      to="/" 
+                      className={({ isActive }) => `
+                        text-black font-semibold text-lg relative group
+                        ${isActive ? 'text-red-500' : ''}
+                      `}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Home
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink 
+                      to="/shop" 
+                      className={({ isActive }) => `
+                        text-black font-semibold text-lg relative group
+                        ${isActive ? 'text-red-500' : ''}
+                      `}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Shop
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                    </NavLink>
+                  </li>
+                  <li 
+                    className="relative group"
+                    onMouseEnter={() => setShowPagesDropdown(true)}
+                    onMouseLeave={() => setShowPagesDropdown(false)}
+                  >
+                    <span 
+                      className="text-black font-semibold text-lg cursor-pointer flex items-center relative group"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Pages <FaAngleDown className="ml-1" />
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                    </span>
+                    <ul 
+                      className={`absolute left-0 top-full bg-white shadow-lg transition-all duration-300 min-w-[200px] z-50 py-2 ${
+                        showPagesDropdown ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+                      }`}
+                    >
+                      <li>
+                        <NavLink 
+                          to="/about" 
+                          className={({ isActive }) => `
+                            block px-5 py-2 text-sm text-gray-800 hover:bg-gray-100 hover:text-black transition-colors
+                            ${isActive ? 'bg-gray-100 text-black' : ''}
+                          `}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          About Us
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink 
+                          to="/shop-details" 
+                          className={({ isActive }) => `
+                            block px-5 py-2 text-sm text-gray-800 hover:bg-gray-100 hover:text-black transition-colors
+                            ${isActive ? 'bg-gray-100 text-black' : ''}
+                          `}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          Shop Details
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink 
+                          to="/shopping-cart" 
+                          className={({ isActive }) => `
+                            block px-5 py-2 text-sm text-gray-800 hover:bg-gray-100 hover:text-black transition-colors
+                            ${isActive ? 'bg-gray-100 text-black' : ''}
+                          `}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          Shopping Cart
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink 
+                          to="/checkout" 
+                          className={({ isActive }) => `
+                            block px-5 py-2 text-sm text-gray-800 hover:bg-gray-100 hover:text-black transition-colors
+                            ${isActive ? 'bg-gray-100 text-black' : ''}
+                          `}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          Check Out
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink 
+                          to="/blog-details" 
+                          className={({ isActive }) => `
+                            block px-5 py-2 text-sm text-gray-800 hover:bg-gray-100 hover:text-black transition-colors
+                            ${isActive ? 'bg-gray-100 text-black' : ''}
+                          `}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          Blog Details
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <NavLink 
+                      to="/blog" 
+                      className={({ isActive }) => `
+                        text-black font-semibold text-lg relative group
+                        ${isActive ? 'text-red-500' : ''}
+                      `}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Blog
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink 
+                      to="/contact" 
+                      className={({ isActive }) => `
+                        text-black font-semibold text-lg relative group
+                        ${isActive ? 'text-red-500' : ''}
+                      `}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Contacts
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                    </NavLink>
+                  </li>
+                </ul>
+              </nav>
+            </Col>
+            <Col lg={3} md={3} className="text-right hidden lg:block">
+              <div className="flex justify-end items-center space-x-8">
+                <div className="p-2 hover:text-gray-600">
+                  <button onClick={() => setShowSearch(true)} className="flex items-center justify-center w-6 h-6">
+                    <FaSearch size={20} />
+                  </button>
+                </div>
+                <div className="p-2 hover:text-gray-600">
+                  <Link to="/wishlist" className="flex items-center justify-center w-6 h-6">
+                    <FaHeart size={20} />
+                  </Link>
+                </div>
+                <div className="p-2 hover:text-gray-600">
+                  <Link to="/cart" className="flex items-center justify-center w-6 h-6 relative">
+                    <FaShoppingCart size={20} />
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
+                      {cartItems}
+                    </span>
+                  </Link>
+                </div>
+                <div className="text-black font-bold pl-2">$0.00</div>
               </div>
             </Col>
           </Row>
         </Container>
-      </div>
 
-      {/* Main Header */}
-      <Container>
-        <Row className="items-center">
-          <Col lg={3} md={3}>
-            <div className="header__logo py-[30px]">
-              <Link to="/">
-                <img src="img/logo.png" alt="Logo" />
-              </Link>
-            </div>
-          </Col>
-          <Col lg={6} md={6}>
-            <nav className="header__menu mobile-menu">
-              <ul className="flex justify-center p-[26px_0_25px]">
-                <li className="list-none inline-block mr-[45px] relative">
-                  <Link to="/" className="text-[#111111] text-lg font-semibold block relative py-1">Home</Link>
-                </li>
-                <li className="list-none inline-block mr-[45px] relative">
-                  <Link to="/shop" className="text-[#111111] text-lg font-semibold block relative py-1">Shop</Link>
-                </li>
-                <li 
-                  className="list-none inline-block mr-[45px] relative"
-                  onMouseEnter={() => handleMouseEnter('pages')}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <span className="text-[#111111] text-lg font-semibold block relative py-1 cursor-pointer">
-                    Pages <i className="fa fa-angle-down ml-1"></i>
-                  </span>
-                  <ul className={`dropdown absolute left-0 top-14 w-[150px] bg-[#111111] text-left p-[5px_0] z-[9] transition-all duration-300 ${activeSubmenu === 'pages' ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                    <li className="block mr-0 hover:bg-[#e53637]">
-                      <Link to="/about" className="text-white text-sm font-normal py-2 px-5 uppercase block hover:text-white">About Us</Link>
-                    </li>
-                    <li className="block mr-0 hover:bg-[#e53637]">
-                      <Link to="/shop-details" className="text-white text-sm font-normal py-2 px-5 uppercase block hover:text-white">Shop Details</Link>
-                    </li>
-                    <li className="block mr-0 hover:bg-[#e53637]">
-                      <Link to="/cart" className="text-white text-sm font-normal py-2 px-5 uppercase block hover:text-white">Shopping Cart</Link>
-                    </li>
-                    <li className="block mr-0 hover:bg-[#e53637]">
-                      <Link to="/checkout" className="text-white text-sm font-normal py-2 px-5 uppercase block hover:text-white">Check Out</Link>
-                    </li>
-                    <li className="block mr-0 hover:bg-[#e53637]">
-                      <Link to="/blog-details" className="text-white text-sm font-normal py-2 px-5 uppercase block hover:text-white">Blog Details</Link>
-                    </li>
-                  </ul>
-                </li>
-                <li className="list-none inline-block mr-[45px] relative">
-                  <Link to="/blog" className="text-[#111111] text-lg font-semibold block relative py-1">Blog</Link>
-                </li>
-                <li className="list-none inline-block relative">
-                  <Link to="/contact" className="text-[#111111] text-lg font-semibold block relative py-1">Contacts</Link>
-                </li>
-              </ul>
-            </nav>
-          </Col>
-          <Col lg={3} md={3}>
-            <div className="header__nav__option text-right py-[30px]">
-              <button className="search-switch inline-block mr-[26px]">
-                <img src="img/icon/search.png" alt="Search" />
+        {/* Mobile Menu */}
+        <div 
+          className={`fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 ${
+            showMobileMenu ? 'opacity-100 visible' : 'opacity-0 invisible'
+          }`}
+          onClick={() => setShowMobileMenu(false)}
+        >
+          <div 
+            className={`fixed top-0 right-0 w-[280px] h-full bg-white transform transition-transform duration-300 ${
+              showMobileMenu ? 'translate-x-0' : 'translate-x-full'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 flex justify-between items-center border-b">
+              <h2 className="text-xl font-bold">Menu</h2>
+              <button onClick={() => setShowMobileMenu(false)} className="text-black">
+                <FaTimes size={24} />
               </button>
-              <Link to="/wishlist" className="inline-block mr-[26px]">
-                <img src="img/icon/heart.png" alt="Wishlist" />
-              </Link>
-              <Link to="/cart" className="inline-block relative">
-                <img src="img/icon/cart.png" alt="Cart" />
-                <span className="text-[#0d0d0d] text-xs absolute left-1 top-2">0</span>
-              </Link>
-              <div className="price text-[#111111] text-sm font-bold inline-block ml-[-20px] relative top-1">$0.00</div>
             </div>
-          </Col>
-        </Row>
-      </Container>
-
-      {/* Mobile Menu */}
-      <div className={`offcanvas-menu-wrapper fixed left-[-300px] w-[300px] h-full bg-white p-[50px_20px_30px_30px] z-[99] overflow-y-auto transition-all duration-500 ${isOffcanvasVisible ? 'left-0 opacity-100' : ''}`}>
-        <div className="offcanvas__menu">
-          <ul className="flex flex-col">
-            {isAuthenticated && (
-              <>
-                <li className="mb-4">
-                  <span className="text-[#111111] text-base font-semibold">My Account</span>
-                  <ul className="pl-4 mt-2 space-y-2">
-                    <li><Link to="/profile" className="text-[#111111] text-sm block py-1"><FaUser className="inline-block mr-2" />Profile</Link></li>
-                    <li><Link to="/orders" className="text-[#111111] text-sm block py-1"><FaShoppingBag className="inline-block mr-2" />Orders</Link></li>
-                    <li><Link to="/settings" className="text-[#111111] text-sm block py-1"><FaCog className="inline-block mr-2" />Settings</Link></li>
-                    <li><button onClick={handleLogout} className="text-[#e53637] text-sm block py-1 w-full text-left"><FaSignOutAlt className="inline-block mr-2" />Sign out</button></li>
+            <div className="p-4">
+              {isAuthenticated && (
+                <div className="mb-4 border-b pb-4">
+                  <h3 className="text-lg font-semibold mb-2">My Account</h3>
+                  <ul className="space-y-2">
+                    <li>
+                      <Link to="/profile" className="flex items-center text-gray-600 hover:text-black">
+                        <FaUser className="mr-2" /> Profile
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/orders" className="flex items-center text-gray-600 hover:text-black">
+                        <FaShoppingBag className="mr-2" /> Orders
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/settings" className="flex items-center text-gray-600 hover:text-black">
+                        <FaCog className="mr-2" /> Settings
+                      </Link>
+                    </li>
+                    <li>
+                      <button onClick={handleLogout} className="flex items-center text-red-600 hover:text-red-700 w-full">
+                        <FaSignOutAlt className="mr-2" /> Sign out
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+              <ul className="space-y-4">
+                <li><Link to="/" className="block text-lg hover:text-gray-600">Home</Link></li>
+                <li><Link to="/shop" className="block text-lg hover:text-gray-600">Shop</Link></li>
+                <li className="space-y-2">
+                  <span className="block text-lg mb-2">Pages</span>
+                  <ul className="pl-4 space-y-2">
+                    <li><Link to="/about" className="block text-gray-600 hover:text-black">About Us</Link></li>
+                    <li><Link to="/shop-details" className="block text-gray-600 hover:text-black">Shop Details</Link></li>
+                    <li><Link to="/shopping-cart" className="block text-gray-600 hover:text-black">Shopping Cart</Link></li>
+                    <li><Link to="/checkout" className="block text-gray-600 hover:text-black">Check Out</Link></li>
+                    <li><Link to="/blog-details" className="block text-gray-600 hover:text-black">Blog Details</Link></li>
                   </ul>
                 </li>
-                <li className="mb-4 border-b border-gray-200"></li>
-              </>
-            )}
-            <li className="mb-4"><Link to="/" className="text-[#111111] text-base">Home</Link></li>
-            <li className="mb-4"><Link to="/shop" className="text-[#111111] text-base">Shop</Link></li>
-            <li className="mb-4">
-              <span 
-                className="text-[#111111] text-base flex items-center justify-between cursor-pointer"
-                onClick={() => setActiveSubmenu(activeSubmenu === 'mobilePages' ? null : 'mobilePages')}
-              >
-                Pages <i className={`fa fa-angle-down transition-transform ${activeSubmenu === 'mobilePages' ? 'rotate-180' : ''}`}></i>
-              </span>
-              <ul className={`pl-4 mt-2 space-y-2 ${activeSubmenu === 'mobilePages' ? 'block' : 'hidden'}`}>
-                <li><Link to="/about" className="text-[#111111] text-sm block py-1">About Us</Link></li>
-                <li><Link to="/shop-details" className="text-[#111111] text-sm block py-1">Shop Details</Link></li>
-                <li><Link to="/cart" className="text-[#111111] text-sm block py-1">Shopping Cart</Link></li>
-                <li><Link to="/checkout" className="text-[#111111] text-sm block py-1">Check Out</Link></li>
-                <li><Link to="/blog-details" className="text-[#111111] text-sm block py-1">Blog Details</Link></li>
+                <li><Link to="/blog" className="block text-lg hover:text-gray-600">Blog</Link></li>
+                <li><Link to="/contact" className="block text-lg hover:text-gray-600">Contacts</Link></li>
+                {!isAuthenticated && (
+                  <li><Link to="/login" className="block text-lg text-red-600 hover:text-red-700">Sign in</Link></li>
+                )}
               </ul>
-            </li>
-            <li className="mb-4"><Link to="/blog" className="text-[#111111] text-base">Blog</Link></li>
-            <li className="mb-4"><Link to="/contact" className="text-[#111111] text-base">Contact</Link></li>
-          </ul>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Mobile Menu Overlay */}
-      <div 
-        className={`offcanvas-menu-overlay fixed inset-0 bg-black/70 z-[98] transition-all duration-500 ${isOffcanvasVisible ? 'visible opacity-100' : 'invisible opacity-0'}`}
-        onClick={toggleOffcanvas}
-      ></div>
-    </header>
+      </header>
+    </>
   );
 };
 

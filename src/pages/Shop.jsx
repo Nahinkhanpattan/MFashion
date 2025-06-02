@@ -81,7 +81,7 @@ const Shop = () => {
       </div>
 
       {/* Header */}
-      <header className="bg-white">
+      {/* <header className="bg-white">
         <div className="bg-black text-white py-2 hidden lg:block">
           <Container>
             <Row>
@@ -145,7 +145,7 @@ const Shop = () => {
             </Col>
           </Row>
         </Container>
-      </header>
+      </header> */}
 
       {/* Breadcrumb */}
       <section className="py-8 bg-gray-100">
