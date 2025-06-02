@@ -4,10 +4,6 @@ import { Container, Row, Col, Carousel, Card } from 'react-bootstrap';
 const AboutPage = () => {
   return (
     <div className="font-sans">
-      {/* Preloader */}
-      <div id="preloder" className="fixed inset-0 w-full h-full bg-black z-[999999]">
-        <div className="loader absolute top-1/2 left-1/2 w-10 h-10 rounded-full border-4 border-red-500 border-l-transparent animate-spin"></div>
-      </div>
 
       {/* Offcanvas Menu */}
       <div className="offcanvas-menu-overlay fixed inset-0 bg-black bg-opacity-70 z-[98] hidden"></div>
