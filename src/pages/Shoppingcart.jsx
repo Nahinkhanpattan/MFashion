@@ -1,23 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Table, Form, Button } from 'react-bootstrap';
-import { FaSearch, FaHeart, FaShoppingCart, FaBars, FaAngleDown, FaTimes, FaSpinner } from 'react-icons/fa';
+import { FaSearch, FaHeart, FaShoppingCart, FaBars, FaAngleDown, FaTimes } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 
 const Shoppingcart = () => {
   const [showSearch, setShowSearch] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState([
     { id: '1', name: 'T-shirt Pants', image: 'cart-1.jpg', price: 98.49, quantity: 2, total: 196.98 },
     { id: '2', name: 'Diagonal Textured Cap', image: 'cart-2.jpg', price: 98.49, quantity: 1, total: 98.49 },
     { id: '3', name: 'Basic Flowing', image: 'cart-3.jpg', price: 98.49, quantity: 1, total: 98.49 },
     { id: '4', name: 'Basic Flowing', image: 'cart-4.jpg', price: 98.49, quantity: 1, total: 98.49 },
   ]);
-
-  // Preloader
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Handle quantity change
   const updateQuantity = (id, newQty) => {
@@ -44,13 +37,6 @@ const Shoppingcart = () => {
 
   return (
     <>
-      {/* Preloader */}
-      {loading && (
-        <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
-          <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      )}
-
       {/* Search Modal */}
       <Modal show={showSearch} onHide={() => setShowSearch(false)} centered className="bg-black bg-opacity-75">
         <Modal.Body className="flex items-center justify-center">
@@ -200,7 +186,7 @@ const Shoppingcart = () => {
                       href="#"
                       className="text-white bg-gray-900 border border-gray-900 text-sm font-bold uppercase tracking-wider px-9 py-4 inline-block"
                     >
-                      <FaSpinner className="inline mr-1" /> Update cart
+                      Update cart
                     </a>
                   </div>
                 </Col>

@@ -1,86 +1,81 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export const AuthContext = createContext(null);
+const AuthContext = createContext();
+
+// Mock user data
+const MOCK_USERS = {
+  admin: {
+    email: 'admin@example.com',
+    password: 'admin123',
+    role: 'admin',
+    name: 'Admin User',
+    avatar: '/img/user-avatar.png'
+  },
+  customer: {
+    email: 'user@example.com',
+    password: 'user123',
+    role: 'customer',
+    name: 'John Doe',
+    avatar: '/img/user-avatar.png'
+  }
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    if (token) {
-      // You would typically validate the token with your backend here
-      setUser({ token }); // In real app, you'd have more user info
+  const login = (email, password) => {
+    // Check admin credentials
+    const adminUser = MOCK_USERS.admin;
+    if (email === adminUser.email && password === adminUser.password) {
+      setUser(adminUser);
+      setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(adminUser));
+      return { success: true, role: 'admin' };
     }
-    setLoading(false);
-  }, []);
 
-  const register = async (userData) => {
-    try {
-      // This is where you'd make an API call to register the user
-      // For demo purposes, we're just storing the user data
-      const { email, password, firstName, lastName } = userData;
-      
-      // Simulate API call
-      const response = {
-        token: 'new_user_token',
-        user: {
-          email,
-          firstName,
-          lastName
-        }
-      };
-
-      // Store the token
-      localStorage.setItem('token', response.token);
-      setUser(response.user);
-      return { success: true };
-    } catch (error) {
-      console.error('Registration failed:', error);
-      return { success: false, error: 'Registration failed' };
+    // Check customer credentials
+    const customerUser = MOCK_USERS.customer;
+    if (email === customerUser.email && password === customerUser.password) {
+      setUser(customerUser);
+      setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(customerUser));
+      return { success: true, role: 'customer' };
     }
-  };
 
-  const login = async (email, password) => {
-    try {
-      // This is where you'd make an API call to your backend
-      // For demo purposes, we're just storing a dummy token
-      const response = {
-        token: 'dummy_token',
-        user: {
-          email,
-          firstName: 'Demo',
-          lastName: 'User'
-        }
-      };
-      
-      localStorage.setItem('token', response.token);
-      setUser(response.user);
-      return true;
-    } catch (error) {
-      console.error('Login failed:', error);
-      return false;
-    }
+    return { success: false, message: 'Invalid credentials' };
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
     setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('user');
   };
 
-  if (loading) {
-    return <div>Loading...</div>; // Or your loading component
-  }
+  // Check if user is already logged in (from localStorage)
+  React.useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const isAdmin = () => user?.role === 'admin';
+  const isCustomer = () => user?.role === 'customer';
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      login, 
-      logout, 
-      register,
-      isAuthenticated: !!user 
-    }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isAuthenticated, 
+        login, 
+        logout, 
+        isAdmin, 
+        isCustomer 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -94,4 +89,4 @@ export const useAuth = () => {
   return context;
 };
 
-export default AuthContext; 
+export { AuthContext }; 

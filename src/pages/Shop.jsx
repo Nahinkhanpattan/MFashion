@@ -1,18 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Accordion, Button, Modal, Form } from 'react-bootstrap';
 import { FaStar, FaStarHalfAlt, FaHeart, FaExchangeAlt, FaSearch, FaShoppingCart, FaBars, FaAngleDown } from 'react-icons/fa';
 
 const Shop = () => {
   const [showSearch, setShowSearch] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState(0);
   const [sortOption, setSortOption] = useState('Low To High');
-
-  // Simulate preloader
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Handle sort change
   const handleSortChange = (e) => {
@@ -22,13 +15,6 @@ const Shop = () => {
 
   return (
     <>
-      {/* Preloader */}
-      {loading && (
-        <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
-          <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      )}
-
       {/* Search Modal */}
       <Modal show={showSearch} onHide={() => setShowSearch(false)} centered className="bg-black bg-opacity-75">
         <Modal.Body className="flex items-center justify-center">

@@ -1,34 +1,11 @@
-import React,{ useEffect } from 'react';
+import React from 'react';
 import { Carousel, Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 const Homepage = () => {
-    useEffect(() => {
-        const handleLoad = () => {
-          const preloader = document.getElementById('preloder');
-          if (preloader) {
-            preloader.style.transition = 'opacity 0.5s ease';
-            preloader.style.opacity = 0;
-            setTimeout(() => {
-              preloader.style.display = 'none';
-            }, 500);
-          }
-        };
-      
-        // Wait for window to load fully (images, etc.)
-        window.addEventListener('load', handleLoad);
-      
-        return () => {
-          window.removeEventListener('load', handleLoad);
-        };
-      }, []);
+
   return (
     <div className="font-sans">
-      {/* Page Preloder */}
-      <div id="preloder" className="fixed w-full h-full top-0 left-0 z-[999999] bg-black">
-        <div className="loader absolute w-10 h-10 top-1/2 left-1/2 mt-[-13px] ml-[-13px] rounded-[60px] border-4 border-red-500 border-l-transparent animate-spin"></div>
-      </div>
-
       {/* Offcanvas Menu */}
       <div className="offcanvas-menu-overlay fixed inset-0 bg-black/70 z-[98] transition-all duration-500 invisible"></div>
       <div className="offcanvas-menu-wrapper fixed left-[-300px] w-[300px] h-full bg-white p-[50px_20px_30px_30px] z-[99] overflow-y-auto transition-all duration-500 opacity-0">

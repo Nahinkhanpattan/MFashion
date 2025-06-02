@@ -1,18 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Nav, Tab, Button, Modal } from 'react-bootstrap';
 import { FaStar, FaStarHalfAlt, FaPlay, FaHeart, FaExchangeAlt, FaBars, FaSearch, FaShoppingCart } from 'react-icons/fa';
 
 const Shopdetails = () => {
   const [showSearch, setShowSearch] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [cartItems, setCartItems] = useState(0);
   const [quantity, setQuantity] = useState(1);
-
-  // Simulate preloader
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Handle quantity change
   const handleQuantityChange = (increment) => {
@@ -21,13 +14,6 @@ const Shopdetails = () => {
 
   return (
     <>
-      {/* Preloader */}
-      {loading && (
-        <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
-          <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      )}
-
       {/* Search Modal */}
       <Modal show={showSearch} onHide={() => setShowSearch(false)} centered className="bg-black bg-opacity-75">
         <Modal.Body className="flex items-center justify-center">
@@ -277,9 +263,7 @@ const Shopdetails = () => {
                     <div>
                       <h5 className="text-xl font-bold mb-3">Material used</h5>
                       <p className="text-gray-600">
-                        Polyester is deemed lower quality due to its
-
- none natural quality's. Made from synthetic materials, not natural like wool. Polyester suits become creased easily and are known for not being breathable. Polyester suits tend to have a shine to them compared to wool and cotton suits, this can make the suit look cheap. The texture of velvet is luxurious and breathable. Velvet is a great choice for dinner party jacket and can be worn all year round.
+                        Polyester is deemed lower quality due to its none natural quality's. Made from synthetic materials, not natural like wool. Polyester suits become creased easily and are known for not being breathable. Polyester suits tend to have a shine to them compared to wool and cotton suits, this can make the suit look cheap. The texture of velvet is luxurious and breathable. Velvet is a great choice for dinner party jacket and can be worn all year round.
                       </p>
                     </div>
                   </Tab.Pane>

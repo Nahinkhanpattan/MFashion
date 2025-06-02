@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import { FaSearch, FaHeart, FaShoppingCart, FaAngleDown, FaBars, FaTimes, FaUser, FaSignOutAlt, FaCog, FaShoppingBag } from 'react-icons/fa';
@@ -7,35 +7,69 @@ import { AuthContext } from '../context/AuthContext';
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, logout } = useContext(AuthContext);
+  const { user, isAuthenticated, logout, isAdmin } = useContext(AuthContext);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [cartItems, setCartItems] = useState(0);
   const [showSearch, setShowSearch] = useState(false);
   const [showPagesDropdown, setShowPagesDropdown] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/mock-login');
+  };
+
+  const renderUserMenu = () => {
+    if (!isAuthenticated) {
+      return (
+        <Link to="/mock-login" className="text-white uppercase text-sm font-semibold mr-6 hover:text-gray-300 no-underline">
+          Sign in
+        </Link>
+      );
+    }
+
+    return (
+      <div className="inline-block relative group">
+        <span className="text-white uppercase text-sm font-semibold cursor-pointer mr-6 hover:text-gray-300">
+          <FaUser className="inline-block mr-1" /> {user.name} <FaAngleDown className="inline" />
+        </span>
+        <ul className="absolute left-0 top-6 bg-white shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[200px] z-50">
+          {isAdmin() && (
+            <li>
+              <Link to="/dashboard" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
+                <FaCog className="mr-2" /> Dashboard
+              </Link>
+            </li>
+          )}
+          <li>
+            <Link to="/profile" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
+              <FaUser className="mr-2" /> Profile
+            </Link>
+          </li>
+          <li>
+            <Link to="/orders" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
+              <FaShoppingBag className="mr-2" /> Orders
+            </Link>
+          </li>
+          <li>
+            <Link to="/settings" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
+              <FaCog className="mr-2" /> Settings
+            </Link>
+          </li>
+          <li>
+            <button 
+              onClick={handleLogout} 
+              className="w-full text-left px-4 py-2 text-red-600 text-sm hover:bg-gray-100 flex items-center"
+            >
+              <FaSignOutAlt className="mr-2" /> Sign out
+            </button>
+          </li>
+        </ul>
+      </div>
+    );
   };
 
   return (
     <>
-      {/* Preloader */}
-      {loading && (
-        <div className="fixed inset-0 bg-white z-[9999] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-500"></div>
-        </div>
-      )}
-
       <style>
         {`
           a {
@@ -46,10 +80,6 @@ const Header = () => {
           }
           .nav-link:hover {
             text-decoration: none !important;
-          }
-          /* Hide scrollbar when preloader is active */
-          body:has(.fixed.inset-0.bg-white.z-\[9999\]) {
-            overflow: hidden;
           }
         `}
       </style>
@@ -63,38 +93,10 @@ const Header = () => {
               </Col>
               <Col lg={6} md={5} className="text-right">
                 <div className="inline-block mr-6">
-                  {!isAuthenticated ? (
-                    <Link to="/login" className="text-white uppercase text-sm font-semibold mr-6 hover:text-gray-300 no-underline">Sign in</Link>
-                  ) : (
-                    <div className="inline-block relative group">
-                      <span className="text-white uppercase text-sm font-semibold cursor-pointer mr-6 hover:text-gray-300">
-                        <FaUser className="inline-block mr-1" /> My Account <FaAngleDown className="inline" />
-                      </span>
-                      <ul className="absolute left-0 top-6 bg-white shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[200px] z-50">
-                        <li>
-                          <Link to="/profile" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
-                            <FaUser className="mr-2" /> Profile
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/orders" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
-                            <FaShoppingBag className="mr-2" /> Orders
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="/settings" className="px-4 py-2 text-black text-sm hover:bg-gray-100 flex items-center">
-                            <FaCog className="mr-2" /> Settings
-                          </Link>
-                        </li>
-                        <li>
-                          <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-red-600 text-sm hover:bg-gray-100 flex items-center">
-                            <FaSignOutAlt className="mr-2" /> Sign out
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  )}
-                  <Link to="/faqs" className="text-white uppercase text-sm font-semibold hover:text-gray-300 no-underline">FAQs</Link>
+                  {renderUserMenu()}
+                  <Link to="/faqs" className="text-white uppercase text-sm font-semibold hover:text-gray-300 no-underline">
+                    FAQs
+                  </Link>
                 </div>
                 <div className="inline-block relative group">
                   <span className="text-white uppercase text-sm font-semibold cursor-pointer">
@@ -346,7 +348,7 @@ const Header = () => {
                 <li><Link to="/blog" className="block text-lg hover:text-gray-600">Blog</Link></li>
                 <li><Link to="/contact" className="block text-lg hover:text-gray-600">Contacts</Link></li>
                 {!isAuthenticated && (
-                  <li><Link to="/login" className="block text-lg text-red-600 hover:text-red-700">Sign in</Link></li>
+                  <li><Link to="/mock-login" className="block text-lg text-red-600 hover:text-red-700">Sign in</Link></li>
                 )}
               </ul>
             </div>
