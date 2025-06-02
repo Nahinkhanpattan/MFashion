@@ -192,7 +192,7 @@ const Header = () => {
                       </li>
                       <li>
                         <NavLink 
-                          to="/shopping-cart" 
+                          to="/cart" 
                           className={({ isActive }) => `
                             block px-5 py-2 text-sm text-gray-800 hover:bg-gray-100 hover:text-black transition-colors
                             ${isActive ? 'bg-gray-100 text-black' : ''}
